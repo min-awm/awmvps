@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"awm-vps/models"
+	"awmvps/models"
 
 	"github.com/gofiber/fiber/v2"
 )

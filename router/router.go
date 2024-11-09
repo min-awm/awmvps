@@ -1,7 +1,7 @@
 package router
 
 import (
-	"awm-vps/controllers"
+	"awmvps/controllers"
 
 	"github.com/gofiber/fiber/v2"
 )

@@ -1,7 +1,8 @@
 package main
 
 import (
-	"awm-vps/router"
+	// "awmvps/modules/filemanager"
+	"awmvps/modules/auth"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -9,9 +10,8 @@ import (
 func main() {
 	app := fiber.New()
 
-	// Thiết lập các router
-	router.SetupRoutes(app)
+	auth.Init(app)
+	// filemanager.Init(app)
 
-	// Khởi chạy server
 	app.Listen(":3000")
 }
