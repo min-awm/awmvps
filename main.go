@@ -2,6 +2,7 @@ package main
 
 import (
 	// "awmvps/modules/filemanager"
+	"awmvps/database"
 	"awmvps/modules/auth"
 
 	"github.com/gofiber/fiber/v2"
@@ -9,6 +10,9 @@ import (
 
 func main() {
 	app := fiber.New()
+
+	database.Init()
+	defer database.Close()
 
 	auth.Init(app)
 	// filemanager.Init(app)
