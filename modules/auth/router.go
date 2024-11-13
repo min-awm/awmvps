@@ -1,8 +1,11 @@
 package auth
 
 import (
+	"awmvps/database"
+
 	jwtware "github.com/gofiber/contrib/jwt"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/log"
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -12,8 +15,13 @@ func Init(app *fiber.App) {
 	api.Post("/login", Login)
 	api.Get("/", accessible)
 
+	tokenKey, err := database.Storage.Get("tokenKey")
+	if err != nil {
+		log.Error(err)
+	}
+
 	app.Use(jwtware.New(jwtware.Config{
-		SigningKey: jwtware.SigningKey{Key: []byte("secret")},
+		SigningKey: jwtware.SigningKey{Key: tokenKey},
 	}))
 
 	api.Get("/restricted", restricted)

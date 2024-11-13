@@ -2,6 +2,8 @@ package database
 
 import (
 	"awmvps/utils"
+	"crypto/rand"
+	"encoding/hex"
 
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/gofiber/storage/bbolt/v2"
@@ -14,6 +16,8 @@ func Init() {
 		Database: "awmvps.db",
 		Bucket:   "awmvps_bucket",
 	})
+
+	Storage.Set("tokenKey", []byte(generateTokenKey()), 0)
 
 	usernameAdmin, err := Storage.Get("usernameAdmin")
 	if err != nil {
@@ -34,4 +38,13 @@ func Close() {
 	if Storage != nil {
 		Storage.Close()
 	}
+}
+
+func generateTokenKey() string {
+	secret := make([]byte, 32)
+	_, err := rand.Read(secret)
+	if err != nil {
+		return "key"
+	}
+	return hex.EncodeToString(secret)
 }

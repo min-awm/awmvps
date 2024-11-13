@@ -1,36 +1,48 @@
 package auth
 
 import (
+	"awmvps/database"
+	"awmvps/utils"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/log"
 	"github.com/golang-jwt/jwt/v5"
 )
 
 func Login(c *fiber.Ctx) error {
-	user := c.FormValue("user")
-	pass := c.FormValue("pass")
+	username := c.FormValue("username")
+	password := c.FormValue("password")
 
-	// Throws Unauthorized error
-	if user != "john" || pass != "doe" {
-		return c.SendStatus(fiber.StatusUnauthorized)
+	usernameAdmin, err := database.Storage.Get("usernameAdmin")
+	if err != nil {
+		return c.JSON(fiber.Map{"success": false, "message": "userPassIncorrect"})
 	}
 
-	// Create the Claims
-	claims := jwt.MapClaims{
-		"name":  "John Doe",
-		"admin": true,
-		"exp":   time.Now().Add(time.Hour * 24).Unix(),
+	passwordAdmin, err := database.Storage.Get("passwordAdmin")
+	if err != nil {
+		return c.JSON(fiber.Map{"success": false, "message": "userPassIncorrect"})
+	}
+
+	if username != string(usernameAdmin) || !utils.VerifyPassword(password, string(passwordAdmin)) {
+		return c.JSON(fiber.Map{"success": false, "message": "userPassIncorrect"})
 	}
 
 	// Create token
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"name": username,
+		"exp":  time.Now().Add(time.Hour * 1).Unix(),
+	})
 
-	// Generate encoded token and send it as response.
-	t, err := token.SignedString([]byte("secret"))
+	tokenKey, err := database.Storage.Get("tokenKey")
 	if err != nil {
-		return c.SendStatus(fiber.StatusInternalServerError)
+		log.Error(err)
 	}
 
-	return c.JSON(fiber.Map{"token": t})
+	t, err := token.SignedString(tokenKey)
+	if err != nil {
+		return c.JSON(fiber.Map{"success": false, "message": "serverError"})
+	}
+
+	return c.JSON(fiber.Map{"success": true, "token": t})
 }

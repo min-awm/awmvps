@@ -1,8 +1,14 @@
-import { createRouter, createWebHistory } from "vue-router";
+import { createRouter, createWebHashHistory } from "vue-router";
 import { useUserStore } from "@/store/user";
 import MainLayout from "@/components/layouts/MainLayout.vue";
 
 const routes = [
+  {
+    path: "/login",
+    name: "login",
+    component: () => import("@/components/auth/Login.vue"),
+  },
+
   {
     path: "/",
     name: "index",
@@ -33,7 +39,7 @@ const routes = [
 ];
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHashHistory(),
   routes: routes,
 });
 

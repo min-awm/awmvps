@@ -1,15 +1,33 @@
 package main
 
 import (
+	"embed"
+	"io/fs"
+	"net/http"
+
 	// "awmvps/modules/filemanager"
 	"awmvps/database"
 	"awmvps/modules/auth"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/log"
+	"github.com/gofiber/fiber/v2/middleware/filesystem"
 )
+
+//go:embed public/*
+var embedDirPublic embed.FS
 
 func main() {
 	app := fiber.New()
+
+	publicFiles, err := fs.Sub(embedDirPublic, "public")
+	if err != nil {
+		log.Error(err)
+	}
+
+	app.Use("/", filesystem.New(filesystem.Config{
+		Root: http.FS(publicFiles),
+	}))
 
 	database.Init()
 	defer database.Close()
