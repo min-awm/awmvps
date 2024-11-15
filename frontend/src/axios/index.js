@@ -2,7 +2,7 @@ import router from "@/router";
 import axios from "axios";
 
 const axiosIns = axios.create({
-  baseURL: `${import.meta.env.VITE_APP_BASE_URL}/api`,
+  baseURL: `${import.meta.env.VITE_APP_BASE_URL}`,
   // timeout: 1000,
   // headers: {'X-Custom-Header': 'foobar'}
 });
@@ -21,7 +21,7 @@ axiosIns.interceptors.response.use(
     return response.data;
   },
   (error) => {
-    console.log(error)
+    console.log(`Axios: ${error}`)
     if (error.response.status === 401) {
       localStorage.removeItem("accessToken");
 

@@ -11,6 +11,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
 )
 
@@ -19,12 +20,12 @@ var embedDirPublic embed.FS
 
 func main() {
 	app := fiber.New()
+	app.Use(cors.New())
 
 	publicFiles, err := fs.Sub(embedDirPublic, "public")
 	if err != nil {
 		log.Error(err)
 	}
-
 	app.Use("/", filesystem.New(filesystem.Config{
 		Root: http.FS(publicFiles),
 	}))

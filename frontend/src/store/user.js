@@ -4,25 +4,13 @@ import { defineStore } from "pinia";
 import router from "@/router";
 
 const DEFINE_USER_INFO = {
-  username: null,
+  name: null,
 };
 
 const defaultState = () => {
   return {
-    userInfo: DEFINE_USER_INFO,
-    balance: 0,
-    settings: {
-      minDeposit: null,
-      minWithdraw: null,
-      bank: {
-        bankName: null,
-        accountNumber: null,
-        holder: null,
-        image: null,
-      },
-    },
+    userInfo: DEFINE_USER_INFO,  
     isLogin: false,
-    showLoginMoblie: 0,
   };
 };
 
@@ -36,32 +24,20 @@ export const useUserStore = defineStore("user", {
       try {
         const res = await axios.get(API.USER_INFO);
         if (res.success) {
-          this.userInfo = res.data;
+          this.userInfo = { name: res.name };
           this.isLogin = true;
         } else {
           this.userInfo = DEFINE_USER_INFO;
         }
       } catch (error) {
-        console.log(error);
+        console.log(`Store User: ${error}`);
       }
-    },
-    
-    updateUserInfo(payload) {
-      Object.assign(this.userInfo, payload);
     },
 
     logout() {
       localStorage.removeItem("accessToken");
       this.$reset();
       router.push("/");
-    },
-
-    setLogin(value) {
-      this.isLogin = value;
-    },
-
-    setShowLoginMoblie() {
-      this.showLoginMoblie += 1;
     },
 
     $reset() {

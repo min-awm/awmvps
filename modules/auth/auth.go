@@ -46,3 +46,10 @@ func Login(c *fiber.Ctx) error {
 
 	return c.JSON(fiber.Map{"success": true, "token": t})
 }
+
+func UserInfo(c *fiber.Ctx) error {
+	user := c.Locals("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	name := claims["name"].(string)
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": true, "name": name})
+}

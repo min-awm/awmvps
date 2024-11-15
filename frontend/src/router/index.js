@@ -7,12 +7,14 @@ const routes = [
     path: "/login",
     name: "login",
     component: () => import("@/components/auth/Login.vue"),
+    meta: { redirectIfLoggedIn: true },
   },
 
   {
     path: "/",
     name: "index",
     component: MainLayout,
+    meta: { auth: true },
     children: [
       {
         path: "/",
@@ -43,26 +45,24 @@ const router = createRouter({
   routes: routes,
 });
 
-// router.beforeEach((to, _, next) => {
-//   const isLoggedIn = localStorage.getItem("accessToken");
-//   const userStore = useUserStore();
+router.beforeEach((to, _, next) => {
+  const isLoggedIn = localStorage.getItem("accessToken");
+  const userStore = useUserStore();
 
-//   if (to.meta.auth && !isLoggedIn) {
-//     userStore.setLogin(false);
-//     userStore.setShowLoginMoblie();
-//     return next({ name: "home" });
-//   }
+  if (to.meta.auth && !isLoggedIn) {
+    return next({ name: "login" });
+  }
 
-//   if (to.meta.redirectIfLoggedIn && isLoggedIn) {
-//     return next({ name: "home" });
-//   }
+  if (to.meta.redirectIfLoggedIn && isLoggedIn) {
+    return next({ name: "home" });
+  }
 
-//   if (to.meta.auth && isLoggedIn) {
-//     // Get userInfo when route change
-//     userStore.getUserInfo();
-//   }
+  if (to.meta.auth && isLoggedIn) {
+    // Get userInfo when route change
+    userStore.getUserInfo();
+  }
 
-//   return next();
-// });
+  return next();
+});
 
 export default router;
