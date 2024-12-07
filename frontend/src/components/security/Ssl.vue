@@ -51,21 +51,8 @@
 
 <script setup>
 import { ref } from "vue";
-import { Copy, Check } from "lucide-vue-next";
 import OpenTerminalButton from "@/components/common/OpenTerminalButton.vue";
 import Code from "@/components/common/Code.vue";
 
 const copyStatus = ref("");
-
-const copyToClipboard = async (text) => {
-  try {
-    await navigator.clipboard.writeText(text);
-    copyStatus.value = text.includes("status") ? "status" : "enable";
-    setTimeout(() => {
-      copyStatus.value = "";
-    }, 2000);
-  } catch (err) {
-    console.error("Failed to copy text: ", err);
-  }
-};
 </script>

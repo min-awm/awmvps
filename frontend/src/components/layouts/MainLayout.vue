@@ -108,7 +108,6 @@ import {
   Folder,
   Globe,
   Database,
-  ChartNoAxesCombined,
   Puzzle,
   Shield,
   HelpCircle,
@@ -121,9 +120,7 @@ import {
 import { useUserStore } from "@/store/user";
 import { storeToRefs } from "pinia";
 import PasswordChangeModal from "@/components/layouts/PasswordChangeModal.vue";
-import { useRouter } from "vue-router";
 
-const router = useRouter();
 const isSidebarOpen = ref(false);
 const userStore = useUserStore();
 const { userInfo } = storeToRefs(userStore);
@@ -150,7 +147,6 @@ const menuItems = [
   { icon: Database, text: "Cơ sở dữ liệu", route: "/databases" },
   { icon: Terminal, text: "Terminal", route: "/terminal" },
   { icon: Shield, text: "Bảo mật", route: "/security" },
-  // { icon: ChartNoAxesCombined, text: "Thống kê", route: "/statistic" },
   { icon: HelpCircle, text: "Hướng dẫn", route: "/tutorial" },
   { icon: Phone, text: "1234 5678", route: "/support" },
 ];

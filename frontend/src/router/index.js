@@ -109,20 +109,6 @@ const routes = [
   },
 
   {
-    path: "/mini-terminal",
-    name: "mini-terminal",
-    component: () => import("@/components/terminal/Xterm.vue"),
-    meta: { auth: true },
-  },
-
-  {
-    path: "/a",
-    name: "a",
-    component: () => import("@/components/terminal/a.vue"),
-    meta: { auth: true },
-  },
-
-  {
     path: "/:pathMatch(.*)*",
     redirect: { name: "home" },
   },

@@ -7,7 +7,7 @@
         :class="{ 'text-green-500': copyStatus === 'done' }"
       >
         <Check v-if="copyStatus === 'done'" class="w-4 h-4" />
-        <Copy v-else class="w-4 h-4 text-gray-500" />
+        <ClipboardPaste v-else class="w-4 h-4 text-gray-500" />
       </button>
     </div>
     <div class="px-4 py-2 text-sm text-gray-600 bg-gray-100 border-b">bash</div>
@@ -17,13 +17,16 @@
 
 <script setup>
 import { ref } from "vue";
-import { Copy, Check } from "lucide-vue-next";
+import { ClipboardPaste, Check } from "lucide-vue-next";
+import { useTerminalStore } from "@/store/terminal";
 
+const terminalStore = useTerminalStore();
 const props = defineProps(["command"]);
 const copyStatus = ref("");
 
 async function copyToClipboard(text) {
   try {
+    terminalStore.setContentCommand(text)
     await navigator.clipboard.writeText(text);
     copyStatus.value = "done";
     setTimeout(() => {
