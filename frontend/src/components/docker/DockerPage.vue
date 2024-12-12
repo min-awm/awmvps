@@ -96,7 +96,7 @@ async function checkStatus() {
   try {
     const res = await axios.get(`${API.STATUS_DOCKER}`);
     if (res.success) {
-      showInstall.value = true;
+      showInstall.value = false;
     }
   } catch (error) {
     console.log(`Docker: ${error}`);

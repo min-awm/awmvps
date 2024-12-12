@@ -82,7 +82,7 @@
                 <td
                   class="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap"
                 >
-                  {{ port.number }}
+                  {{ port.number }} {{}}
                 </td>
                 <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
                   {{ port.protocol }}
@@ -148,14 +148,18 @@ async function getListPort() {
       const lines = inputData.trim().split("\n");
       const portObjects = lines
         .map((line) => {
-          const match = line.match(/(\w+)\s+dpt:(\d+)/);
-          return match
-            ? { protocol: match[1], number: parseInt(match[2], 10) }
+          const match = line.match(/(\w+)\s+dpt:(\d+)(?:\s+#conn)?/);
+          return match && !line.includes("#conn")
+            ? {
+                protocol: match[1],
+                number: parseInt(match[2], 10),
+              }
             : null;
         })
         .filter((entry) => entry !== null);
 
       listPort.value = portObjects;
+      console.log(portObjects);
     } else {
       console.log(`Port: ${res.message}`);
     }

@@ -5,16 +5,16 @@ import (
 	"os/exec"
 )
 
-func DetectOS() string {
+func DetectPackageManager() string {
 	if _, err := exec.LookPath("apt"); err == nil {
-		return "deb"
+		return "apt"
 	}
 
 	if _, err := exec.LookPath("yum"); err == nil {
-		return "rpm"
+		return "yum"
 	}
 
-	return "notSupport"
+	return "not"
 }
 
 func RunCommand(command string, args ...string) (string, error) {

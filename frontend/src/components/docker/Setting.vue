@@ -18,17 +18,44 @@
             href="https://docs.docker.com/engine/install/ubuntu/#uninstall-docker-engine"
             target="_blank"
             rel="noopener noreferrer"
+            v-if="packageManager == 'not' || packageManager == 'apt'"
           >
             https://docs.docker.com/engine/install/ubuntu/#uninstall-docker-engine
           </a>
+
+          <a
+            href="https://docs.docker.com/engine/install/ubuntu/#uninstall-docker-engine"
+            target="_blank"
+            rel="noopener noreferrer"
+            v-if="packageManager == 'yum'"
+          >
+            https://docs.docker.com/engine/install/fedora/#uninstall-docker-engine
+          </a>
         </div>
 
-       <OpenTerminalButton />
+        <OpenTerminalButton />
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
+import { ref } from "vue";
 import OpenTerminalButton from "@/components/common/OpenTerminalButton.vue";
+import axios from "@/axios";
+import API from "@/api";
+
+const packageManager = ref("not");
+getPackageManager();
+
+async function getPackageManager() {
+  try {
+    const res = await axios.get(`${API.PACKAGE_MANAGER}`);
+    if (res.success) {
+      packageManager.value = res.data;
+    }
+  } catch (error) {
+    console.log(`Ssl: ${error}`);
+  }
+}
 </script>

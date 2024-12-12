@@ -11,16 +11,25 @@
         Lưu ý: Chứng chỉ Let's Encrypt có hạn 90 ngày.
       </p>
 
-      <div class="mb-4">
-        <p class="mb-2 text-gray-900">Cài đặt Certbot:</p>
-        <Code command="sudo yum install certbot python3-certbot-nginx" />
+      <div class="flex flex-col gap-3 mb-4">
+        <p class="text-gray-900">Cài đặt Certbot:</p>
+        <Code
+          command="sudo apt install certbot python3-certbot-nginx"
+          v-if="packageManager == 'not' || packageManager == 'apt'"
+        />
+        <Code
+          command="sudo yum install certbot python3-certbot-nginx"
+          v-if="packageManager == 'not' || packageManager == 'yum'"
+        />
       </div>
 
       <div class="mb-4">
         <p class="mb-2 text-gray-900">
           Tạo chứng chỉ SSL cho tên miền(example.com):
         </p>
-        <Code command="sudo certbot --nginx -d example.com" />
+        <div class="flex flex-col gap-4">
+          <Code command="sudo certbot --nginx -d example.com" />
+        </div>
       </div>
     </section>
 
@@ -53,6 +62,21 @@
 import { ref } from "vue";
 import OpenTerminalButton from "@/components/common/OpenTerminalButton.vue";
 import Code from "@/components/common/Code.vue";
+import axios from "@/axios";
+import API from "@/api";
 
-const copyStatus = ref("");
+const packageManager = ref("not");
+getPackageManager()
+
+async function getPackageManager() {
+  try {
+    const res = await axios.get(`${API.PACKAGE_MANAGER}`);
+    if (res.success) {
+      packageManager.value = res.data
+    }
+
+  } catch (error) {
+    console.log(`Ssl: ${error}`);
+  }
+}
 </script>

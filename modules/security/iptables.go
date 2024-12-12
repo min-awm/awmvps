@@ -48,7 +48,7 @@ func RemoveBlockIp(c *fiber.Ctx) error {
 }
 
 func ListPort(c *fiber.Ctx) error {
-	output, err := utils.RunCommand("bash", "-c", "iptables -L -v -n --line-numbers | awk '/dpt:/ {print $11,$12}'")
+	output, err := utils.RunCommand("bash", "-c", "iptables -L -v -n --line-numbers | awk '/dpt:/ {print $11,$12,$13}'")
 	if err != nil {
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": output})
 	}
@@ -115,6 +115,21 @@ func DropAllPort(c *fiber.Ctx) error {
 
 func UndoDropAllPort(c *fiber.Ctx) error {
 	if output, err := utils.RunCommand("iptables", "-P", "INPUT", "ACCEPT"); err != nil {
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": output})
+	}
+
+	err := utils.SaveIptablesConfig()
+	if err != nil {
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": err})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": true})
+}
+
+func AllRole(c *fiber.Ctx) error {
+	role := c.FormValue("role")
+
+	if output, err := utils.RunCommand("bash", "-c", role); err != nil {
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": output})
 	}
 

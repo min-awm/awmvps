@@ -17,4 +17,6 @@ func Init(app *fiber.App) {
 	api.Post("/drop-port", DropPort)
 	api.Get("/drop-all-port", DropAllPort)
 	api.Get("/undo-drop-all-port", UndoDropAllPort)
+
+	api.Post("/add-role", AllRole)
 }

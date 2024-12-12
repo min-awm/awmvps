@@ -103,6 +103,21 @@ const routes = [
             name: "ssl",
             component: () => import("@/components/security/Ssl.vue"),
           },
+          {
+            path: "iftop",
+            name: "iftop",
+            component: () => import("@/components/security/Iftop.vue"),
+          },
+          {
+            path: "htop",
+            name: "htop",
+            component: () => import("@/components/security/Htop.vue"),
+          },
+          {
+            path: "ddos",
+            name: "ddos",
+            component: () => import("@/components/security/DDos.vue"),
+          },
         ],
       },
     ],

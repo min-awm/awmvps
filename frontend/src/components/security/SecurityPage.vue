@@ -45,11 +45,14 @@
           >
             <Lock class="w-5 h-5 text-green-600" />
           </div>
-          <span class="text-sm font-medium text-gray-900">Cấu hình SSL/TLS</span>
+          <span class="text-sm font-medium text-gray-900">
+            Cấu hình SSL/TLS
+          </span>
         </RouterLink>
 
         <!-- Activity -->
-        <button
+        <RouterLink
+          to="/security/iftop"
           class="flex items-center p-3 space-x-3 transition-colors rounded-lg hover:bg-gray-50"
         >
           <div
@@ -60,7 +63,7 @@
           <span class="text-sm font-medium text-gray-900">
             Theo dõi truy cập
           </span>
-        </button>
+        </RouterLink>
 
         <!-- DatabaseBackup -->
         <!-- <button
@@ -75,7 +78,8 @@
         </button> -->
 
         <!-- Leech Protection -->
-        <button
+        <RouterLink
+          to="/security/htop"
           class="flex items-center p-3 space-x-3 transition-colors rounded-lg hover:bg-gray-50"
         >
           <div
@@ -84,9 +88,9 @@
             <Shield class="w-5 h-5 text-yellow-600" />
           </div>
           <span class="text-sm font-medium text-gray-900">
-            Bảo vệ hotlink
+            Theo dõi tiến trình
           </span>
-        </button>
+        </RouterLink>
 
         <!-- SSL/TLS Status -->
         <!-- <button
@@ -114,7 +118,8 @@
         </RouterLink>
 
         <!-- Imunify360 -->
-        <button
+        <RouterLink
+          to="/security/ddos"
           class="flex items-center p-3 space-x-3 transition-colors rounded-lg hover:bg-gray-50"
         >
           <div
@@ -123,23 +128,13 @@
             <ShieldCheck class="w-5 h-5 text-rose-600" />
           </div>
           <span class="text-sm font-medium text-gray-900">Chống DDOS</span>
-        </button>
+        </RouterLink>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import {
-  Shield,
-  Lock,
-  Activity,
-  Key,
-  ShieldCheck,
-} from "lucide-vue-next";
+import { Shield, Lock, Activity, Key, ShieldCheck } from "lucide-vue-next";
 import { RouterLink } from "vue-router";
 </script>
-
-<style scoped>
-/* Add any additional component-specific styles here if needed */
-</style>

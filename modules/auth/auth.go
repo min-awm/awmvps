@@ -77,3 +77,8 @@ func ChangeUserInfo(c *fiber.Ctx) error {
 
 	return c.JSON(fiber.Map{"success": true})
 }
+
+func GetPackageManager(c *fiber.Ctx) error {
+	packageManager := utils.DetectPackageManager()
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": true, "data": packageManager})
+}

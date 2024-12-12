@@ -10,9 +10,9 @@ import (
 )
 
 func InstallMariaDB(c *fiber.Ctx) error {
-	osType := utils.DetectOS()
+	packageManager := utils.DetectPackageManager()
 
-	if osType == "deb" {
+	if packageManager == "apt" {
 		if output, err := utils.RunCommand("apt", "install", "-y", "mariadb-server", "mariadb-client"); err != nil {
 			return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": output})
 		}
@@ -46,7 +46,7 @@ func InstallMariaDB(c *fiber.Ctx) error {
 		}
 
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": true, "message": "Cài đặt thành công MariaDB"})
-	} else if osType == "rpm" {
+	} else if packageManager == "yum" {
 		if output, err := utils.RunCommand("yum", "install", "-y", "mariadb-server", "mariadb"); err != nil {
 			return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": output})
 		}
@@ -178,9 +178,9 @@ func DeleteUserMariaDB(c *fiber.Ctx) error {
 }
 
 func RemoveMariaDB(c *fiber.Ctx) error {
-	osType := utils.DetectOS()
+	packageManager := utils.DetectPackageManager()
 
-	if osType == "deb" {
+	if packageManager == "apt" {
 		if output, err := utils.RunCommand("systemctl", "stop", "mariadb"); err != nil {
 			return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": output})
 		}
@@ -194,7 +194,7 @@ func RemoveMariaDB(c *fiber.Ctx) error {
 		}
 
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": true, "message": "Gỡ cài đặt thành công MariaDB"})
-	} else if osType == "rpm" {
+	} else if packageManager == "yum" {
 		if output, err := utils.RunCommand("systemctl", "stop", "mariadb"); err != nil {
 			return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": output})
 		}

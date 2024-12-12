@@ -7,9 +7,9 @@ import (
 )
 
 func Install(c *fiber.Ctx) error {
-	osType := utils.DetectOS()
+	packageManager := utils.DetectPackageManager()
 
-	if osType == "deb" {
+	if packageManager == "apt" {
 		if output, err := utils.RunCommand("apt", "install", "-y", "nginx"); err != nil {
 			return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": output})
 		}
@@ -21,7 +21,7 @@ func Install(c *fiber.Ctx) error {
 		}
 
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": true, "message": "Cài đặt thành công Nginx"})
-	} else if osType == "rpm" {
+	} else if packageManager == "yum" {
 		if output, err := utils.RunCommand("yum", "install", "-y", "nginx"); err != nil {
 			return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": output})
 		}
@@ -66,9 +66,9 @@ func Stop(c *fiber.Ctx) error {
 }
 
 func Remove(c *fiber.Ctx) error {
-	osType := utils.DetectOS()
+	packageManager := utils.DetectPackageManager()
 
-	if osType == "deb" {
+	if packageManager == "apt" {
 		if output, err := utils.RunCommand("systemctl", "stop", "nginx"); err != nil {
 			return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": output})
 		}
@@ -78,7 +78,7 @@ func Remove(c *fiber.Ctx) error {
 		}
 
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": true, "message": "Gỡ cài đặt thành công Nginx"})
-	} else if osType == "rpm" {
+	} else if packageManager == "yum" {
 		if output, err := utils.RunCommand("systemctl", "stop", "nginx"); err != nil {
 			return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": output})
 		}

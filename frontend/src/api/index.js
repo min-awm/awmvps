@@ -4,6 +4,7 @@ export default {
   REGISTER: "/auth/register",
   USER_INFO: "/auth/user-info",
   CHANGE_USER_INFO: "/auth/change-user-info",
+  PACKAGE_MANAGER: "/auth/package-manager",
 
   // filemanager
   CHECK_PATH: "/filemanager/check-path",
@@ -56,4 +57,7 @@ export default {
   DROP_PORT: "/security/drop-port",
   DROP_ALL_PORT: "/security/drop-all-port",
   UNDO_DROP_ALL_PORT: "/security/undo-drop-all-port",
+
+  // ddos
+  ADD_ROLE: "/security/add-role"
 };

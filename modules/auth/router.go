@@ -26,4 +26,5 @@ func Init(app *fiber.App) {
 
 	api.Get("/user-info", UserInfo)
 	api.Post("/change-user-info", ChangeUserInfo)
+	api.Get("/package-manager", GetPackageManager)
 }

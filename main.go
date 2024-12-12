@@ -39,13 +39,14 @@ func main() {
 
 	database.Init()
 	defer database.Close()
-	security.Init(app)
+
 	auth.Init(app)
 	terminal.Init(app)
 	databases.Init(app)
 	docker.Init(app)
 	filemanager.Init(app)
 	nginx.Init(app)
+	security.Init(app)
 
 	log.Info("My app is running at port 3000")
 	app.Listen(":3000")
