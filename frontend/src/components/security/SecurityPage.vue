@@ -30,7 +30,7 @@
           <div
             class="flex items-center justify-center flex-shrink-0 w-10 h-10 rounded-lg bg-blue-50"
           >
-            <Shield class="w-5 h-5 text-blue-600" />
+            <ShieldBan class="w-5 h-5 text-blue-600" />
           </div>
           <span class="text-sm font-medium text-gray-900">Chặn IP</span>
         </RouterLink>
@@ -85,7 +85,7 @@
           <div
             class="flex items-center justify-center flex-shrink-0 w-10 h-10 rounded-lg bg-yellow-50"
           >
-            <Shield class="w-5 h-5 text-yellow-600" />
+            <Cpu class="w-5 h-5 text-yellow-600" />
           </div>
           <span class="text-sm font-medium text-gray-900">
             Theo dõi tiến trình
@@ -135,6 +135,14 @@
 </template>
 
 <script setup>
-import { Shield, Lock, Activity, Key, ShieldCheck } from "lucide-vue-next";
+import {
+  Shield,
+  Lock,
+  Activity,
+  Key,
+  ShieldCheck,
+  ShieldBan,
+  Cpu,
+} from "lucide-vue-next";
 import { RouterLink } from "vue-router";
 </script>

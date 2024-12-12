@@ -79,11 +79,21 @@
             :key="`MainLayout-menuItems-${i}`"
             class="flex items-center px-4 py-2 text-left rounded-md hover:bg-gray-100 menu-item"
             :to="item.route"
-            @click="isSidebarOpen = false;"
+            @click="isSidebarOpen = false"
           >
             <component :is="item.icon" class="w-4 h-4 mr-2" />
             {{ item.text }}
           </RouterLink>
+          
+          <a
+            href="https://github.com/min-awm/awmvps/issues"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center px-4 py-2 text-left rounded-md hover:bg-gray-100 menu-item"
+          >
+            <Github class="w-4 h-4 mr-2" />
+            Hỗ trợ
+          </a>
         </nav>
       </aside>
 
@@ -111,7 +121,7 @@ import {
   Puzzle,
   Shield,
   HelpCircle,
-  Phone,
+  Github,
   AlignJustify,
   Terminal,
   Lock,
@@ -148,7 +158,6 @@ const menuItems = [
   { icon: Terminal, text: "Terminal", route: "/terminal" },
   { icon: Shield, text: "Bảo mật", route: "/security" },
   { icon: HelpCircle, text: "Hướng dẫn", route: "/tutorial" },
-  { icon: Phone, text: "1234 5678", route: "/support" },
 ];
 
 function toggleSidebar() {

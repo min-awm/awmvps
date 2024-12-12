@@ -120,6 +120,11 @@ const routes = [
           },
         ],
       },
+      {
+        path: "/tutorial",
+        name: "tutorial",
+        component: () => import("@/components/tutorial/TutorialPage.vue"),
+      },
     ],
   },
 

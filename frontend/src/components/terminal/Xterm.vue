@@ -35,8 +35,17 @@ onMounted(() => {
   window.addEventListener("resize", fitTerminal);
 
   const token = localStorage.getItem("accessToken");
+
+  const hostname = window.location.hostname;
+  const port = window.location.port;
+  const ipHost = `${hostname}${port ? `:${port}` : ""}`;
+  
   ws = new WebSocket(
-    `ws://${import.meta.env.VITE_APP_BASE_URL}/terminal?token=${token}`
+    `ws://${
+      import.meta.env.VITE_APP_MODE == "dev"
+        ? import.meta.env.VITE_APP_BASE_URL
+        : ipHost
+    }/terminal?token=${token}`
   );
 
   ws.onmessage = (event) => {
