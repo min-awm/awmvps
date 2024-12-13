@@ -42,4 +42,8 @@ sudo systemctl start $APP_NAME
 echo "Kiểm tra trạng thái dịch vụ..."
 sudo systemctl status $APP_NAME
 
+# 5. Mở cổng 3000 bằng iptables
+echo "Mở cổng 3000 bằng iptables..."
+sudo iptables -I INPUT -p tcp --dport 3000 -j ACCEPT
+
 echo "=== Hoàn thành cài đặt và chạy ứng dụng ==="

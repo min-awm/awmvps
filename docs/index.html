@@ -1,14 +1,243 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>AWMVPS - Quản lý VPS Đơn Giản và Hiệu Quả</title>
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f3f4f6;
+        }
+
+        /* Header styles */
+        header {
+            background-color: #2563eb;
+            color: white;
+            padding: 1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+        }
+
+        nav ul li {
+            margin-right: 1rem;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+        }
+
+        nav ul li a:hover {
+            color: #bfdbfe;
+        }
+
+        /* Main content styles */
+        main {
+            padding: 2rem 0;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 3rem 0;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: #4b5563;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: #2563eb;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            text-decoration: none;
+            border-radius: 0.25rem;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #1d4ed8;
+        }
+
+        .section {
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .section ul,
+        .section ol {
+            padding-left: 1.5rem;
+        }
+
+        .section li {
+            margin-bottom: 0.5rem;
+        }
+
+        pre {
+            background-color: #f3f4f6;
+            padding: 1rem;
+            border-radius: 0.25rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+            position: relative;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background-color: #e5e7eb;
+            border: none;
+            border-radius: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+        }
+
+        .copy-btn:hover {
+            background-color: #d1d5db;
+        }
+
+        /* Footer styles */
+        footer {
+            background-color: #1f2937;
+            color: white;
+            text-align: center;
+            padding: 1rem 0;
+            margin-top: 3rem;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            header .container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            nav ul {
+                margin-top: 1rem;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
 </head>
 
 <body>
-    test
+    <header>
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+            <h1>AWMVPS</h1>
+            <nav>
+                <ul>
+                    <li><a href="#about">Giới thiệu</a></li>
+                    <li><a href="#features">Tính năng</a></li>
+                    <li><a href="#installation">Cài đặt</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="hero">
+            <h1>Quản lý VPS Đơn Giản và Hiệu Quả</h1>
+            <p>Giải pháp toàn diện cho việc quản lý VPS của bạn</p>
+            <a href="#installation" class="btn">Bắt đầu ngay</a>
+        </section>
+
+        <section id="about" class="section">
+            <h2>Giới thiệu về AWMVPS</h2>
+            <p>
+                AWMVPS là một công cụ giúp bạn quản lý VPS (Virtual Private Server) một cách
+                dễ dàng và hiệu quả.
+                Với giao diện thân thiện và tính năng đa dạng, AWMVPS là giải pháp lý tưởng cho cả người mới bắt
+                đầu.
+            </p>
+        </section>
+
+        <section id="features" class="section">
+            <h2>Tính năng chính</h2>
+            <ul>
+                <li>Quản lý tập tin</li>
+                <li>Docker</li>
+                <li>Terminal</li>
+                <li>Nginx</li>
+                <li>Bảo mật</li>
+            </ul>
+        </section>
+
+        <section id="installation" class="section">
+            <h2>Hướng dẫn cài đặt</h2>
+            <ol>
+                <li>
+                    <strong>Với install.sh:</strong>
+                    <pre>wget -qO- https://min-awm.github.io/awmvps/install.sh | bash<button class="copy-btn" onclick="copyToClipboard(this, `wget -qO- https://min-awm.github.io/awmvps/install.sh | bash`)">Copy</button></pre>
+                </li>
+            </ol>
+            <p>
+                Sau khi hoàn tất các bước trên, bạn có thể truy cập AWMVPS qua trình duyệt web tại địa chỉ
+                <code>http://your_vps_ip:3080</code>
+            </p>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 AWMVPS</p>
+        </div>
+    </footer>
+
+    <script>
+        function copyToClipboard(button, text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
+        }
+    </script>
 </body>
 
 </html>

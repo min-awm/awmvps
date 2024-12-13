@@ -2,14 +2,18 @@ package terminal
 
 import (
 	"io"
+	"os"
 	"os/exec"
 
 	"github.com/creack/pty"
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/log"
 )
 
 func Init(app *fiber.App) {
+	setXTERM()
+
 	app.Get("/terminal", websocket.New(func(c *websocket.Conn) {
 		defer c.Close()
 
@@ -56,4 +60,11 @@ func Init(app *fiber.App) {
 			}
 		}
 	}))
+}
+
+func setXTERM() {
+	err := os.Setenv("TERM", "xterm")
+	if err != nil {
+		log.Error("Error setting TERM:", err)
+	}
 }
