@@ -13,10 +13,8 @@ func Init(app *fiber.App) {
 	api.Post("/remove-block-ip", RemoveBlockIp)
 
 	api.Get("/list-port", ListPort)
-	api.Post("/open-port", OpenPort)
-	api.Post("/drop-port", DropPort)
-	api.Get("/drop-all-port", DropAllPort)
-	api.Get("/undo-drop-all-port", UndoDropAllPort)
+	api.Post("/add-port", AddPort)
+	api.Post("/remove-port", RemovePort)
 
 	api.Post("/add-role", AllRole)
 }

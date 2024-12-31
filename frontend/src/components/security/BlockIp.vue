@@ -75,9 +75,7 @@ async function getBlockedIps() {
   try {
     const res = await axios.get(`${API.LIST_BLOCK_IP}`);
     if (res.success) {
-      blockedIps.value = [...res.message.trim().split("\n")].filter(
-        (ip) => ip !== ""
-      );
+      blockedIps.value = res.message
     } else {
       console.log(`BlockIp: ${res.message}`);
     }

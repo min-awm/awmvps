@@ -5,8 +5,8 @@
     <div class="mb-6 overflow-hidden bg-white rounded-lg shadow-sm">
       <div class="p-4 border-b border-gray-200 sm:p-6">
         <h2 class="mb-4 text-xl font-semibold text-gray-900">Thêm cổng mới</h2>
-        <form @submit.prevent="openPort" class="space-y-4">
-          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <form @submit.prevent="addPort" class="space-y-4">
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div>
               <label for="port" class="block text-sm font-medium text-gray-700">
                 Cổng
@@ -34,6 +34,23 @@
               >
                 <option value="TCP">TCP</option>
                 <option value="UDP">UDP</option>
+              </select>
+            </div>
+            <div>
+              <label
+                for="port-status"
+                class="block text-sm font-medium text-gray-700"
+              >
+                Trạng thái
+              </label>
+              <select
+                id="port-status"
+                v-model="newPort.status"
+                required
+                class="block w-full py-3 pl-3 pr-10 mt-1 text-base border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              >
+                <option value="ACCEPT">Cho phép</option>
+                <option value="DROP">Chặn</option>
               </select>
             </div>
           </div>
@@ -82,7 +99,8 @@
                 <td
                   class="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap"
                 >
-                  {{ port.number }} {{}}
+                  {{ port.status == "DROP" ? "Chặn" : "Cho phép " }}
+                  {{ port.port }}
                 </td>
                 <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
                   {{ port.protocol }}
@@ -91,7 +109,7 @@
                   class="flex px-6 py-4 text-sm font-medium text-right whitespace-nowrap"
                 >
                   <button
-                    @click="dropPort(port.number, port.protocol)"
+                    @click="dropPort(port.port, port.protocol, port.status)"
                     class="text-red-600 hover:text-red-900"
                   >
                     <TrashIcon class="w-5 h-5" />
@@ -101,22 +119,6 @@
               </tr>
             </tbody>
           </table>
-        </div>
-
-        <div class="flex gap-4 mt-6">
-          <button
-            @click="dropAllPort"
-            class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-          >
-            Chỉ cho phép các cổng đã cấu hình
-          </button>
-
-          <button
-            @click="undoDropAllPort"
-            class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          >
-            Cho phép mặc định
-          </button>
         </div>
       </div>
     </div>
@@ -136,6 +138,7 @@ const listPort = ref([]);
 const newPort = ref({
   number: "",
   protocol: "TCP",
+  status: "ACCEPT",
 });
 
 getListPort();
@@ -144,22 +147,7 @@ async function getListPort() {
   try {
     const res = await axios.get(`${API.LIST_PORT}`);
     if (res.success) {
-      const inputData = res.message;
-      const lines = inputData.trim().split("\n");
-      const portObjects = lines
-        .map((line) => {
-          const match = line.match(/(\w+)\s+dpt:(\d+)(?:\s+#conn)?/);
-          return match && !line.includes("#conn")
-            ? {
-                protocol: match[1],
-                number: parseInt(match[2], 10),
-              }
-            : null;
-        })
-        .filter((entry) => entry !== null);
-
-      listPort.value = portObjects;
-      console.log(portObjects);
+      listPort.value = res.message;
     } else {
       console.log(`Port: ${res.message}`);
     }
@@ -168,12 +156,13 @@ async function getListPort() {
   }
 }
 
-async function openPort() {
+async function addPort() {
   try {
     const formData = new FormData();
     formData.append("port", newPort.value.number);
     formData.append("protocol", newPort.value.protocol);
-    const res = await axios.post(`${API.OPEN_PORT}`, formData);
+    formData.append("status", newPort.value.status);
+    const res = await axios.post(`${API.ADD_PORT}`, formData);
     if (res.success) {
       newPort.value.number = "";
       toast.success("Thêm cổng thành công");
@@ -187,47 +176,18 @@ async function openPort() {
   }
 }
 
-async function dropPort(port, protocol) {
+async function dropPort(port, protocol, status) {
   try {
     const formData = new FormData();
     formData.append("port", port);
     formData.append("protocol", protocol);
-    const res = await axios.post(`${API.DROP_PORT}`, formData);
+    formData.append("status", status);
+    const res = await axios.post(`${API.REMOVE_PORT}`, formData);
     if (res.success) {
       toast.success("Xóa cổng thành công");
       getListPort();
     } else {
       toast.error("Lỗi xóa cổng dịch vụ");
-      console.log(`Port: ${res.message}`);
-    }
-  } catch (error) {
-    console.log(`Port: ${error}`);
-  }
-}
-
-async function dropAllPort() {
-  try {
-    const res = await axios.get(`${API.DROP_ALL_PORT}`);
-    if (res.success) {
-      toast.success("Đã chặn mọi cổng");
-      getListPort();
-    } else {
-      toast.error("Lỗi chặn mọi cổng");
-      console.log(`Port: ${res.message}`);
-    }
-  } catch (error) {
-    console.log(`Port: ${error}`);
-  }
-}
-
-async function undoDropAllPort() {
-  try {
-    const res = await axios.get(`${API.UNDO_DROP_ALL_PORT}`);
-    if (res.success) {
-      toast.success("Đã cho phép mặc định");
-      getListPort();
-    } else {
-      toast.error("Lỗi cho phép mặc định");
       console.log(`Port: ${res.message}`);
     }
   } catch (error) {

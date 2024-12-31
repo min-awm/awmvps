@@ -1,27 +1,64 @@
 package security
 
 import (
+	"awmvps/database"
 	"awmvps/utils"
+	"encoding/json"
 	"os/exec"
 
+	"github.com/coreos/go-iptables/iptables"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
 )
 
-func ListBlockIp(c *fiber.Ctx) error {
-	output, err := utils.RunCommand("bash", "-c", "iptables -L INPUT -v -n | grep DROP | awk '{print $8}'")
-	if err != nil {
-		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": output})
+func getListIp() []string {
+	list, _ := database.Storage.Get("listIp")
+	var listArray []string
+	err := json.Unmarshal(list, &listArray)
+	if err != nil || listArray == nil {
+		listArray = []string{}
 	}
 
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": true, "message": output})
+	return listArray
+}
+
+// Ip
+func existIp(value string) bool {
+	list := getListIp()
+	for _, item := range list {
+		if item == value {
+			return true
+		}
+	}
+	return false
+}
+
+func removeIp(list []string, target string) []string {
+	var newList []string
+	for _, item := range list {
+		if item != target {
+			newList = append(newList, item)
+		}
+	}
+	return newList
+}
+
+func ListBlockIp(c *fiber.Ctx) error {
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": true, "message": getListIp()})
 }
 
 func AddBlockIp(c *fiber.Ctx) error {
 	ip := c.FormValue("ip")
-	output, err := utils.RunCommand("iptables", "-A", "INPUT", "-s", ip, "-j", "DROP")
+
+	exist := existIp(ip)
+	if exist {
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": "IP already exists"})
+	}
+
+	ipt, _ := iptables.New()
+	err := ipt.AppendUnique("filter", "INPUT", "-s", ip, "-j", "DROP")
 	if err != nil {
-		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": output})
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": err})
 	}
 
 	err = utils.SaveIptablesConfig()
@@ -29,14 +66,30 @@ func AddBlockIp(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": err})
 	}
 
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": true, "message": output})
+	listIp := getListIp()
+	listIp = append(listIp, ip)
+	listIpBytes, err := json.Marshal(listIp)
+	if err != nil {
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": "Error encoding IP list"})
+	}
+
+	database.Storage.Set("listIp", []byte(listIpBytes), 0)
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": true})
 }
 
 func RemoveBlockIp(c *fiber.Ctx) error {
 	ip := c.FormValue("ip")
-	output, err := utils.RunCommand("iptables", "-D", "INPUT", "-s", ip, "-j", "DROP")
+
+	exist := existIp(ip)
+	if !exist {
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": "Not found IP"})
+	}
+
+	ipt, _ := iptables.New()
+	err := ipt.DeleteIfExists("filter", "INPUT", "-s", ip, "-j", "DROP")
 	if err != nil {
-		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": output})
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": err})
 	}
 
 	err = utils.SaveIptablesConfig()
@@ -44,68 +97,112 @@ func RemoveBlockIp(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": err})
 	}
 
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": true, "message": output})
+	listIp := getListIp()
+	listIp = removeIp(listIp, ip)
+	listIpBytes, err := json.Marshal(listIp)
+	if err != nil {
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": "Error encoding IP list"})
+	}
+
+	database.Storage.Set("listIp", []byte(listIpBytes), 0)
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": true})
+}
+
+// Port
+type PortType struct {
+	Protocol string `json:"protocol"`
+	Port     string `json:"port"`
+	Status   string `json:"status"`
+}
+
+func getListPort() []PortType {
+	list, _ := database.Storage.Get("listPort")
+	var listArray []PortType
+	err := json.Unmarshal(list, &listArray)
+	if err != nil || listArray == nil {
+		listArray = []PortType{}
+	}
+
+	return listArray
+}
+
+func existPort(port string, protocol string) (bool, PortType) {
+	listPort := getListPort()
+	for _, item := range listPort {
+		if item.Port == port && item.Protocol == protocol {
+			return true, item
+		}
+	}
+
+	return false, PortType{}
+}
+
+func removePort(list []PortType, target PortType) []PortType {
+	var newList []PortType
+	for _, item := range list {
+		if item != target {
+			newList = append(newList, item)
+		}
+	}
+	return newList
 }
 
 func ListPort(c *fiber.Ctx) error {
-	output, err := utils.RunCommand("bash", "-c", "iptables -L -v -n --line-numbers | awk '/dpt:/ {print $11,$12,$13}'")
-	if err != nil {
-		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": output})
-	}
-
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": true, "message": output})
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": true, "message": getListPort()})
 }
 
-func OpenPort(c *fiber.Ctx) error {
-	port := c.FormValue("port")
+func AddPort(c *fiber.Ctx) error {
+	portNumber := c.FormValue("port")
 	protocol := c.FormValue("protocol")
-	output, err := utils.RunCommand("iptables", "-A", "INPUT", "-p", protocol, "--dport", port, "-j", "ACCEPT")
-	if err != nil {
-		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": output})
+	status := c.FormValue("status")
+
+	ipt, _ := iptables.New()
+	exist, portItem := existPort(portNumber, protocol)
+
+	if exist && portItem.Status == status {
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": "Port already exists"})
 	}
 
-	err = utils.SaveIptablesConfig()
+	if exist {
+		// delete old port
+		err := ipt.DeleteIfExists("filter", "INPUT", "-p", portItem.Protocol, "--dport", portItem.Port, "-j", portItem.Status)
+		if err != nil {
+			return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": err})
+		}
+
+		listPort := getListPort()
+		listPort = removePort(listPort, portItem)
+
+		listPortBytes, err := json.Marshal(listPort)
+
+		if err != nil {
+			return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": "Error encoding old port list"})
+		}
+
+		database.Storage.Set("listPort", []byte(listPortBytes), 0)
+	}
+
+	// add new port
+	err := ipt.AppendUnique("filter", "INPUT", "-p", protocol, "--dport", portNumber, "-j", status)
 	if err != nil {
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": err})
 	}
 
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": true, "message": output})
-}
-
-func DropPort(c *fiber.Ctx) error {
-	port := c.FormValue("port")
-	protocol := c.FormValue("protocol")
-	output, err := utils.RunCommand("iptables", "-D", "INPUT", "-p", protocol, "--dport", port, "-j", "ACCEPT")
+	listPort := getListPort()
+	listPort = append(listPort, PortType{
+		Port:     portNumber,
+		Protocol: protocol,
+		Status:   status,
+	})
+	listPortBytes, err := json.Marshal(listPort)
 	if err != nil {
-		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": output})
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": "Error encoding new port list"})
 	}
+
+	database.Storage.Set("listPort", []byte(listPortBytes), 0)
 
 	err = utils.SaveIptablesConfig()
-	if err != nil {
-		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": err})
-	}
-
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": true, "message": output})
-}
-
-func DropAllPort(c *fiber.Ctx) error {
-	if output, err := utils.RunCommand("iptables", "-P", "INPUT", "DROP"); err != nil {
-		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": output})
-	}
-
-	if output, err := utils.RunCommand("iptables", "-A", "INPUT", "-p", "tcp", "--dport", "ssh", "-j", "ACCEPT"); err != nil {
-		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": output})
-	}
-
-	if output, err := utils.RunCommand("iptables", "-A", "INPUT", "-p", "tcp", "--dport", "3000", "-j", "ACCEPT"); err != nil {
-		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": output})
-	}
-
-	if output, err := utils.RunCommand("iptables", "-A", "INPUT", "-i", "lo", "-j", "ACCEPT"); err != nil {
-		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": output})
-	}
-
-	err := utils.SaveIptablesConfig()
 	if err != nil {
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": err})
 	}
@@ -113,12 +210,33 @@ func DropAllPort(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": true})
 }
 
-func UndoDropAllPort(c *fiber.Ctx) error {
-	if output, err := utils.RunCommand("iptables", "-P", "INPUT", "ACCEPT"); err != nil {
-		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": output})
+func RemovePort(c *fiber.Ctx) error {
+	portNumber := c.FormValue("port")
+	protocol := c.FormValue("protocol")
+	status := c.FormValue("status")
+
+	ipt, _ := iptables.New()
+	err := ipt.DeleteIfExists("filter", "INPUT", "-p", protocol, "--dport", portNumber, "-j", status)
+	if err != nil {
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": err})
 	}
 
-	err := utils.SaveIptablesConfig()
+	listPort := getListPort()
+	listPort = removePort(listPort, PortType{
+		Port:     portNumber,
+		Protocol: protocol,
+		Status:   status,
+	})
+
+	listPortBytes, err := json.Marshal(listPort)
+
+	if err != nil {
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": "Error encoding port list"})
+	}
+
+	database.Storage.Set("listPort", []byte(listPortBytes), 0)
+
+	err = utils.SaveIptablesConfig()
 	if err != nil {
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": err})
 	}
@@ -148,7 +266,6 @@ func IptablesRestore() {
 
 	cmd := exec.Command("iptables-restore", "iptables_backup.conf")
 
-	// Chạy lệnh
 	if err := cmd.Run(); err != nil {
 		log.Error("Failed to restore iptables config: ", err)
 	}

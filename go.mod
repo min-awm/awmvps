@@ -10,6 +10,7 @@ require (
 )
 
 require (
+	github.com/coreos/go-iptables v0.8.0 // indirect
 	github.com/fasthttp/websocket v1.5.8 // indirect
 	github.com/savsgio/gotils v0.0.0-20240303185622-093b76447511 // indirect
 	golang.org/x/net v0.30.0 // indirect

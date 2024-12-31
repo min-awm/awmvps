@@ -53,10 +53,8 @@ export default {
 
   // port
   LIST_PORT: "/security/list-port",
-  OPEN_PORT: "/security/open-port",
-  DROP_PORT: "/security/drop-port",
-  DROP_ALL_PORT: "/security/drop-all-port",
-  UNDO_DROP_ALL_PORT: "/security/undo-drop-all-port",
+  ADD_PORT: "/security/add-port",
+  REMOVE_PORT: "/security/remove-port",
 
   // ddos
   ADD_ROLE: "/security/add-role"
