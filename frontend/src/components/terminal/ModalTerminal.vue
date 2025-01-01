@@ -1,6 +1,7 @@
 <template>
+  <!-- bg-[#1e1e1e] -->
   <div
-    class="w-full max-w-4xl bg-[#1e1e1e] rounded-md shadow-xl overflow-hidden z-[9999] right-0 bottom-0 fixed"
+    class="w-full max-w-4xl bg-[#fff] rounded-md shadow-xl overflow-hidden z-[9999] right-0 bottom-0 fixed"
     :style="{ transform: `translate(${position.x}px, ${position.y}px)` }"
   >
     <!-- Terminal Header -->

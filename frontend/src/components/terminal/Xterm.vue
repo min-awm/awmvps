@@ -11,14 +11,26 @@ import { useTerminalStore } from "@/store/terminal";
 
 const terminalStore = useTerminalStore();
 const terminalRef = ref();
+// const terminal = new Terminal({
+//   cursorBlink: true,
+//   fontSize: 14,
+//   theme: {
+//     background: "#1e1e1e",
+//     foreground: "#ffffff",
+//   },
+// });
+
 const terminal = new Terminal({
   cursorBlink: true,
   fontSize: 14,
   theme: {
-    background: "#1e1e1e",
-    foreground: "#ffffff",
+    background: "#ffffff",
+    foreground: "#000000",
+    cursor: "#000000",
+    selection: "#d3d3d3", 
   },
 });
+
 
 const fitAddon = new FitAddon();
 terminal.loadAddon(fitAddon);
