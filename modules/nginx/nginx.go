@@ -2,6 +2,8 @@ package nginx
 
 import (
 	"awmvps/utils"
+	"os"
+	"path/filepath"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -94,42 +96,63 @@ func Remove(c *fiber.Ctx) error {
 }
 
 func ListConf(c *fiber.Ctx) error {
-	output, err := utils.RunCommand("bash", "-c", "cd /etc/nginx/conf.d && ls *.conf")
+	dirPath := "/etc/nginx/conf.d/"
+
+	files, err := filepath.Glob(filepath.Join(dirPath, "*.conf"))
 	if err != nil {
-		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": output})
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": "Lỗi khi tìm file"})
 	}
 
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": true, "message": output})
+	fileNames := []string{}
+	for _, file := range files {
+		fileNames = append(fileNames, filepath.Base(file))
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": true, "message": fileNames})
 }
 
 func GetFileConf(c *fiber.Ctx) error {
 	fileName := c.FormValue("fileName")
-	output, err := utils.RunCommand("cat", "/etc/nginx/conf.d/"+fileName)
+	dirPath := "/etc/nginx/conf.d/"
+	fullPath := filepath.Join(dirPath, fileName)
+
+	content, err := os.ReadFile(fullPath)
 	if err != nil {
-		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": output})
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": "Lỗi khi đọc file " + fileName})
 	}
 
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": true, "message": output})
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": true, "message": string(content)})
 }
 
 func CreateConf(c *fiber.Ctx) error {
 	fileName := c.FormValue("fileName")
-	if output, err := utils.RunCommand("sh", "-c", `echo -e "server {
-	listen 80;
-	server_name example.com;
-	# Replace with your server_name
+	content := `server {
+	listen 80; # Lắng nghe trên cổng 80
+	server_name example.com www.example.com; # Tên miền server
+
+	root /var/www/example.com; # Thư mục gốc của website
+	index index.html index.htm;
 
 	location / {
-		# Replace with your app
-		proxy_pass http://localhost:3000;
-		proxy_http_version 1.1;
-		proxy_set_header Upgrade \$http_upgrade;
-		proxy_set_header Connection 'upgrade';
-		proxy_set_header Host \$host;
-		proxy_cache_bypass \$http_upgrade;
+		try_files $uri $uri/ =404; # Cách xử lý yêu cầu
 	}
-}" | tee /etc/nginx/conf.d/`+fileName+` > /dev/null`); err != nil {
-		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": output})
+
+	error_page 404 /404.html; # Trang lỗi 404 tùy chỉnh
+}`
+
+	dirPath := "/etc/nginx/conf.d/"
+	fullPath := filepath.Join(dirPath, fileName)
+
+	file, err := os.Create(fullPath)
+	if err != nil {
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": "Không thể tạo file " + fileName})
+
+	}
+	defer file.Close()
+
+	_, err = file.WriteString(content)
+	if err != nil {
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": "Không thể ghi vào file " + fileName})
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": true, "message": "Đã tạo file: " + fileName})
@@ -137,8 +160,12 @@ func CreateConf(c *fiber.Ctx) error {
 
 func RemoveConf(c *fiber.Ctx) error {
 	fileName := c.FormValue("fileName")
-	if output, err := utils.RunCommand("rm", "/etc/nginx/conf.d/"+fileName); err != nil {
-		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": output})
+	dirPath := "/etc/nginx/conf.d/"
+	fullPath := filepath.Join(dirPath, fileName)
+
+	err := os.Remove(fullPath)
+	if err != nil {
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": "Không thể xóa file " + fileName})
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": true, "message": "Đã xóa file: " + fileName})
@@ -147,8 +174,20 @@ func RemoveConf(c *fiber.Ctx) error {
 func SaveConf(c *fiber.Ctx) error {
 	fileName := c.FormValue("fileName")
 	content := c.FormValue("content")
-	if output, err := utils.RunCommand("sh", "-c", `echo -e "`+content+`" | tee /etc/nginx/conf.d/`+fileName+` > /dev/null`); err != nil {
-		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": output})
+
+	dirPath := "/etc/nginx/conf.d/"
+	fullPath := filepath.Join(dirPath, fileName)
+
+	file, err := os.Create(fullPath)
+	if err != nil {
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": "Không thể lưu file " + fileName})
+
+	}
+	defer file.Close()
+
+	_, err = file.WriteString(content)
+	if err != nil {
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": false, "message": "Không thể ghi vào file " + fileName})
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": true, "message": "Đã lưu thay đổi: " + fileName})

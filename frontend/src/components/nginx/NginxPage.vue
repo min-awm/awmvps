@@ -120,7 +120,7 @@
       </div>
     </div>
 
-    <div class="p-6 pt-0">
+    <div class="p-6 pt-0" v-if="step == 1">
       <button
         @click="checkConf"
         class="flex items-center px-4 py-2 my-4 font-medium text-white bg-green-500 border border-transparent rounded-md shadow-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
@@ -158,7 +158,9 @@ import { ref } from "vue";
 import { Download, Loader2, Trash2 } from "lucide-vue-next";
 import axios from "@/axios";
 import API from "@/api";
+import { useToast } from "vue-toastification";
 
+const toast = useToast();
 const step = ref(0);
 const dataLogs = ref([]);
 const status = ref("");
@@ -311,28 +313,20 @@ async function getListConf() {
   try {
     const res = await axios.get(`${API.LIST_CONF_NGINX}`);
     if (res.success) {
-      const fileList = res.message
-        .trim()
-        .split("\n")
-        .map((name, index) => ({ id: index + 1, name }));
+      const fileList = res.message.map((name, index) => ({
+        id: index + 1,
+        name,
+      }));
       if (fileList.length) {
         selectedConfig.value = fileList[0];
         getFileConf(fileList[0]);
-      }
-      configs.value = fileList;
-    } else {
-      if (
-        res.message == "ls: cannot access '*.conf': No such file or directory\n"
-      ) {
+      } else {
         configs.value = [];
         selectedConfig.value = null;
         contentFileConf.value = "";
-      } else {
-        dataLogs.value.push(
-          `[${new Date().toLocaleTimeString()}] ${res.message}`
-        );
       }
-    }
+      configs.value = fileList;
+    } 
   } catch (error) {
     console.log(`Nginx: ${error}`);
   }
@@ -364,6 +358,9 @@ async function createFileConf() {
     if (res.success) {
       getListConf();
       nameFileConf.value = "";
+      toast.success(res.message);
+    } else {
+      toast.error(res.message);
     }
 
     dataLogs.value.push(`[${new Date().toLocaleTimeString()}] ${res.message}`);
@@ -382,6 +379,9 @@ async function removeFileConf() {
     const res = await axios.post(API.REMOVE_CONF_NGINX, formData);
     if (res.success) {
       getListConf();
+      toast.success(res.message);
+    } else {
+      toast.error(res.message);
     }
 
     dataLogs.value.push(`[${new Date().toLocaleTimeString()}] ${res.message}`);
@@ -397,8 +397,8 @@ async function saveFileConf() {
     }
     const formData = new FormData();
     formData.append("fileName", `${selectedConfig.value.name}`);
-    formData.append("content", `${contentFileConf.value.replace(/\$/g, '\\$')}`);
-    console.log(contentFileConf.value.replace(/\$/g, '\\$'))
+    formData.append("content", contentFileConf.value);
+    
     const res = await axios.post(API.SAVE_CONF_NGINX, formData);
 
     dataLogs.value.push(`[${new Date().toLocaleTimeString()}] ${res.message}`);
