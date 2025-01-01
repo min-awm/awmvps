@@ -10,6 +10,7 @@ export default {
   CHECK_PATH: "/filemanager/check-path",
   GET_LIST: "/filemanager/list",
   RENAME_FILE: "/filemanager/rename",
+  UPLOAD_FILE: "/filemanager/upload-file",
 
   // database
   STATUS_MARIADB: "/databases/status-mariadb",

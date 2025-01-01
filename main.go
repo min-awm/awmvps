@@ -25,6 +25,7 @@ var embedDirPublic embed.FS
 
 func main() {
 	app := fiber.New(fiber.Config{
+		BodyLimit:             500 * 1024 * 1024,
 		DisableStartupMessage: true,
 	})
 	app.Use(cors.New())

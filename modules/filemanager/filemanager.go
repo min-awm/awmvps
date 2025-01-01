@@ -24,7 +24,6 @@ func List(c *fiber.Ctx) error {
 	queryPath := c.Query("path", os.Getenv("HOME"))
 	cmd := exec.Command("bash", "-c", "cd "+queryPath+" && ls -F")
 
-	// Lấy kết quả
 	output, err := cmd.Output()
 	if err != nil {
 		log.Error(err)

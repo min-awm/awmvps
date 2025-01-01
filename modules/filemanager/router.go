@@ -10,4 +10,5 @@ func Init(app *fiber.App) {
 	api.Get("/check-path", CheckPath)
 	api.Get("/list", List)
 	api.Post("/rename", Rename)
+	api.Post("/upload-file", UploadFile)
 }

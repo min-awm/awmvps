@@ -38,16 +38,7 @@
           </div>
 
           <div class="flex items-center space-x-2">
-            <!-- <button class="p-2 rounded-md hover:bg-gray-100">
-              <CloudUpload class="w-5 h-5 text-gray-600" />
-              <input
-                type="file"
-                webkitdirectory
-                directory
-                multiple
-                @change="handleFileChange"
-              />
-            </button> -->
+            <UploadFile :path="path" @uploadDone="refreshDirectoryFn()" />
           </div>
         </div>
       </div>
@@ -65,13 +56,13 @@
           isSidebarOpen ? 'translate-x-0 ' : '-translate-x-full hidden'
         } scroll-bar overflow-y-auto h-screen md:h-[calc(100vh-140px)] md:translate-x-0 fixed md:static inset-y-0 left-0 w-64 border-r transform bg-white transition-transform duration-200 ease-in-out z-30`"
       >
-        <div
+        <!-- <div
           class="text-sm mx-6 border-t pt-2 flex gap-2 items-center absolute top-[60px] right-0 left-0"
           v-if="sidebarItems.length === 1"
         >
           <Plus size="18" />
           Dấu trang
-        </div>
+        </div> -->
         <nav class="p-4 space-y-1">
           <draggable
             class="md:h-[calc(100vh-180px)] h-screen"
@@ -85,6 +76,7 @@
                 :class="`flex items-center space-x-3 px-3 py-2 rounded-md text-sm cursor-pointer mb-2 ${
                   element?.active ? 'bg-gray-100' : 'hover:bg-gray-100'
                 }`"
+                @click="checkPath('')"
               >
                 <component :is="element.icon" class="w-5 h-5 text-gray-600" />
                 <span>{{ element.name }}</span>
@@ -133,7 +125,6 @@ import {
   File,
   Folder,
   Plus,
-  CloudUpload,
   Bookmark,
   RefreshCw,
   Forward,
@@ -145,26 +136,23 @@ import draggable from "vuedraggable";
 import axios from "@/axios";
 import API from "@/api";
 import { useToast } from "vue-toastification";
+import UploadFile from "@/components/files/UploadFile.vue";
 // import RenameModal from "@/components/files/RenameModal.vue";
 
 const toast = useToast();
 const isSidebarOpen = ref(true);
-const sidebarItems = ref([{ name: "Home", icon: Home, active: true }]);
+const sidebarItems = ref([
+  { name: "Home", icon: Home, active: true, path: "home" },
+]);
 const folders = ref();
 const refreshDirectory = ref(false);
 const showSendPath = ref(false);
-const path = ref("/home/min");
+const path = ref();
 const pathTemp = ref("");
-const selectedFiles = ref([]);
 
 function changeSideBarItems(evt) {
   window.console.log(evt.added);
   return false;
-}
-
-function handleFileChange(event) {
-  console.log(event)
-  selectedFiles.value = Array.from(event.target.files);
 }
 
 async function checkPath(queryPath) {
@@ -268,26 +256,25 @@ function backPath() {
   checkPath(pathQuery);
 }
 
-async function rename() {
-  try {
-    const formData = new FormData();
-    formData.append("oldName", "/home/min/my-code/test/a1.html");
-    formData.append("newName", "/home/min/my-code/test/a6.html");
+// async function rename() {
+//   try {
+//     const formData = new FormData();
+//     formData.append("oldName", "/home/min/my-code/test/a1.html");
+//     formData.append("newName", "/home/min/my-code/test/a6.html");
 
-    const res = await axios.post(API.RENAME_FILE, formData);
-    if (res.success) {
-      toast.success("Đổi tên thành công");
-      checkPath(path.value);
-    } else {
-      toast.error("Đổi tên lỗi");
-    }
-  } catch (error) {
-    console.log(`Filemanager: ${error}`);
-    toast.error("Lỗi");
-  }
-}
+//     const res = await axios.post(API.RENAME_FILE, formData);
+//     if (res.success) {
+//       toast.success("Đổi tên thành công");
+//       checkPath(path.value);
+//     } else {
+//       toast.error("Đổi tên lỗi");
+//     }
+//   } catch (error) {
+//     console.log(`Filemanager: ${error}`);
+//     toast.error("Lỗi");
+//   }
+// }
 
-// rename()
 checkPath("");
 onMounted(() => {
   if (window.innerWidth < 768) {
