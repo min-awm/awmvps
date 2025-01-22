@@ -23,6 +23,21 @@ const routes = [
         component: () => import("@/components/home/HomePage.vue"),
       },
       {
+        path: "/sites",
+        children: [
+          {
+            path: "",
+            name: "sites-page",
+            component: () => import("@/components/sites/SitePage.vue"),
+          },
+          {
+            path: "new",
+            name: "new-site",
+            component: () => import("@/components/sites/NewSite.vue"),
+          },
+        ],
+      },
+      {
         path: "/files",
         name: "files",
         component: () => import("@/components/files/FileManager.vue"),
